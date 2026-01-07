@@ -1,11 +1,12 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { ShoppingCart } from 'lucide-react';
+import { ShoppingCart, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Product } from '@/data/products';
 import { useCartStore } from '@/stores/useCartStore';
+import ShareButton from '@/components/ShareButton';
 
 interface ProductCardProps {
   product: Product;
@@ -15,6 +16,12 @@ const ProductCard = ({ product }: ProductCardProps) => {
   const addToCart = useCartStore((state) => state.addToCart);
   const [selectedSize, setSelectedSize] = useState(product.sizes?.[0] || 1);
   const [showSizeSelector, setShowSizeSelector] = useState(false);
+
+  // Generate consistent random rating for each product based on id
+  const rating = useMemo(() => {
+    const seed = product.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    return (4 + (seed % 10) / 10).toFixed(1);
+  }, [product.id]);
 
   const currentPrice = product.pricePerLb 
     ? product.price * selectedSize 
@@ -44,18 +51,26 @@ const ProductCard = ({ product }: ProductCardProps) => {
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
           
-          {/* Badges */}
-          <div className="absolute top-3 left-3 flex flex-wrap gap-2">
-            {product.popular && (
-              <Badge className="bg-primary text-primary-foreground text-xs">
-                Popular
-              </Badge>
-            )}
-            {!product.available && (
-              <Badge variant="secondary" className="text-xs">
-                Out of Stock
-              </Badge>
-            )}
+          {/* Top Bar: Badges + Share */}
+          <div className="absolute top-3 left-3 right-3 flex items-start justify-between">
+            <div className="flex flex-wrap gap-2">
+              {product.popular && (
+                <Badge className="bg-primary text-primary-foreground text-xs">
+                  Popular
+                </Badge>
+              )}
+              {!product.available && (
+                <Badge variant="secondary" className="text-xs">
+                  Out of Stock
+                </Badge>
+              )}
+            </div>
+            <div onClick={(e) => e.preventDefault()}>
+              <ShareButton 
+                productName={product.name} 
+                productUrl={`/product/${product.id}`} 
+              />
+            </div>
           </div>
 
           {/* Quick Add Button */}
@@ -82,6 +97,13 @@ const ProductCard = ({ product }: ProductCardProps) => {
           <h3 className="font-display text-lg font-semibold text-foreground mb-2 line-clamp-1 group-hover:text-primary transition-colors">
             {product.name}
           </h3>
+
+          {/* Rating */}
+          <div className="flex items-center gap-1 mb-2">
+            <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+            <span className="text-sm font-medium text-foreground">{rating}</span>
+            <span className="text-xs text-muted-foreground">/5</span>
+          </div>
 
           {/* Tags */}
           <div className="flex flex-wrap gap-1 mb-3">
@@ -125,7 +147,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
                 className="w-full mt-3"
                 onClick={handleAddToCart}
               >
-                Add to Cart - ₹{currentPrice}
+                Add to Cart - Rs {currentPrice}
               </Button>
             </div>
           )}
@@ -133,9 +155,10 @@ const ProductCard = ({ product }: ProductCardProps) => {
           {/* Price */}
           {!showSizeSelector && (
             <div className="flex items-center justify-between">
-              <div>
+              <div className="flex items-baseline gap-1">
+                <span className="text-sm font-medium text-muted-foreground">Rs</span>
                 <span className="font-display text-xl font-bold text-primary">
-                  ₹{product.price}
+                  {product.price}
                 </span>
                 {product.pricePerLb && (
                   <span className="text-sm text-muted-foreground">/lb</span>

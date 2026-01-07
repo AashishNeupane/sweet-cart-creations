@@ -2,6 +2,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, MessageCircle, Calendar, Clock } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import BottomNav from '@/components/BottomNav';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -39,7 +40,7 @@ const Checkout = () => {
     return (
       <div className="min-h-screen flex flex-col">
         <Header />
-        <main className="flex-1 flex items-center justify-center bg-background">
+        <main className="flex-1 flex items-center justify-center bg-background pb-16 md:pb-0">
           <div className="text-center px-4">
             <div className="text-8xl mb-6">🛒</div>
             <h1 className="font-display text-2xl md:text-3xl font-bold mb-4">
@@ -54,6 +55,7 @@ const Checkout = () => {
           </div>
         </main>
         <Footer />
+        <BottomNav />
       </div>
     );
   }
@@ -148,7 +150,7 @@ const Checkout = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-      <main className="flex-1 bg-background">
+      <main className="flex-1 bg-background pb-20 md:pb-0">
         <div className="container-custom section-padding">
           {/* Back Button */}
           <Button asChild variant="ghost" className="mb-6">
@@ -388,7 +390,7 @@ const Checkout = () => {
                                 <Badge variant="secondary" className="text-xs mt-1">Eggless</Badge>
                               )}
                               <p className="text-sm font-medium text-primary">
-                                ₹{itemPrice * item.quantity}
+                                Rs {itemPrice * item.quantity}
                               </p>
                             </div>
                           </div>
@@ -401,7 +403,7 @@ const Checkout = () => {
                     <div className="flex justify-between items-baseline mb-6">
                       <span className="font-display text-lg font-semibold">Total</span>
                       <span className="font-display text-2xl font-bold text-primary">
-                        ₹{getCartTotal()}
+                        Rs {getCartTotal()}
                       </span>
                     </div>
 

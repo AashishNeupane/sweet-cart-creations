@@ -6,8 +6,8 @@ export const SOCIAL_LINKS = {
   facebook: 'https://www.facebook.com/blackberrycakes.np',
   instagram: 'https://www.instagram.com/blackberrycakes.np/',
   whatsapp: `https://wa.me/${WHATSAPP_NUMBER}`,
-  maps: 'https://share.google/r6aIBzGF1ScS51N6a',
-  mapsDirections: 'https://www.google.com/maps/dir/?api=1&destination=27.7172,85.3240',
+  maps: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3667!2d84.1264329!3d27.6454557!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3994519044c8c6bb%3A0x2c1b6d667e034031!2zSjRXRys1SEYsIFVubmFtZWQgUm9hZCwgS2F3YXNvdGk!5e0!3m2!1sen!2snp!4v1700000000000!5m2!1sen!2snp',
+  mapsDirections: 'https://www.google.com/maps/dir//J4WG%2B5HF,+Unnamed+Road,+Kawasoti+33000/@27.716028,85.3474687,3667m/data=!3m1!1e3!4m8!4m7!1m0!1m5!1m1!1s0x3994519044c8c6bb:0x2c1b6d667e034031!2m2!1d84.1264329!2d27.6454557?entry=ttu',
 };
 
 interface OrderDetails {
@@ -77,13 +77,13 @@ export function generateOrderMessage(items: CartItem[], details: OrderDetails, t
     }
     
     message += `   Qty: ${item.quantity}\n`;
-    message += `   Price: ₹${totalItemPrice}\n`;
+    message += `   Price: Rs ${totalItemPrice}\n`;
   });
 
   message += `\n━━━━━━━━━━━━━━━━━━━━\n`;
-  message += `*Subtotal: ₹${total}*\n`;
+  message += `*Subtotal: Rs ${total}*\n`;
   message += `*Delivery Fee: Calculated separately*\n`;
-  message += `*Total: ₹${total}*\n`;
+  message += `*Total: Rs ${total}*\n`;
 
   return encodeURIComponent(message);
 }

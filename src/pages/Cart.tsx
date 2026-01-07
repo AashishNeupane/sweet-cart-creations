@@ -2,6 +2,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, Trash2, Minus, Plus, ShoppingBag } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import BottomNav from '@/components/BottomNav';
 import UpsellPopup from '@/components/UpsellPopup';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -33,7 +34,7 @@ const Cart = () => {
     return (
       <div className="min-h-screen flex flex-col">
         <Header />
-        <main className="flex-1 flex items-center justify-center bg-background">
+        <main className="flex-1 flex items-center justify-center bg-background pb-16 md:pb-0">
           <div className="text-center px-4">
             <div className="text-8xl mb-6">🛒</div>
             <h1 className="font-display text-2xl md:text-3xl font-bold mb-4">
@@ -51,6 +52,7 @@ const Cart = () => {
           </div>
         </main>
         <Footer />
+        <BottomNav />
       </div>
     );
   }
@@ -58,7 +60,7 @@ const Cart = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-      <main className="flex-1 bg-background">
+      <main className="flex-1 bg-background pb-20 md:pb-0">
         <div className="container-custom section-padding">
           {/* Header */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
@@ -164,11 +166,11 @@ const Cart = () => {
                             {/* Price */}
                             <div className="text-right">
                               <p className="font-display text-xl font-bold text-primary">
-                                ₹{totalItemPrice}
+                                Rs {totalItemPrice}
                               </p>
                               {item.quantity > 1 && (
                                 <p className="text-sm text-muted-foreground">
-                                  ₹{itemPrice} each
+                                  Rs {itemPrice} each
                                 </p>
                               )}
                             </div>
@@ -198,7 +200,7 @@ const Cart = () => {
                   <div className="space-y-3 text-sm">
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Subtotal</span>
-                      <span className="font-medium">₹{getCartTotal()}</span>
+                      <span className="font-medium">Rs {getCartTotal()}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Delivery</span>
@@ -211,7 +213,7 @@ const Cart = () => {
                   <div className="flex justify-between items-baseline mb-6">
                     <span className="font-display text-lg font-semibold">Total</span>
                     <span className="font-display text-2xl font-bold text-primary">
-                      ₹{getCartTotal()}
+                      Rs {getCartTotal()}
                     </span>
                   </div>
 
@@ -234,6 +236,7 @@ const Cart = () => {
         </div>
       </main>
       <Footer />
+      <BottomNav />
       <UpsellPopup />
     </div>
   );

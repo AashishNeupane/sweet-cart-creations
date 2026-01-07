@@ -10,7 +10,7 @@ const contactInfo = [
   {
     icon: MapPin,
     title: 'Visit Us',
-    details: ['Kathmandu, Nepal'],
+    details: ['Kawasoti, Nawalpur, Nepal'],
   },
   {
     icon: Phone,
@@ -139,7 +139,7 @@ const Contact = () => {
                 {/* Map Embed */}
                 <div className="md:col-span-2 h-[400px]">
                   <iframe
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3532.3063444424836!2d85.32159!3d27.7172!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjfCsDQzJzAxLjkiTiA4NcKwMTknMTcuOCJF!5e0!3m2!1sen!2snp!4v1600000000000!5m2!1sen!2snp"
+                    src={SOCIAL_LINKS.maps}
                     width="100%"
                     height="100%"
                     style={{ border: 0 }}
