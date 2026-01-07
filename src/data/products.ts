@@ -15,6 +15,7 @@ export interface Product {
   price: number;
   pricePerLb?: boolean;
   image: string;
+  galleryImages?: string[];
   description: string;
   tags: string[];
   available: boolean;
@@ -22,14 +23,8 @@ export interface Product {
   sizes?: number[];
 }
 
-export interface CartItem {
-  product: Product;
-  quantity: number;
-  selectedSize?: number;
-}
-
-// WhatsApp configuration - Update this with your number
-export const WHATSAPP_NUMBER = "1234567890"; // Include country code without +
+// Re-export from whatsapp.ts for backward compatibility
+export { WHATSAPP_NUMBER } from '@/lib/whatsapp';
 
 export const products: Product[] = [
   // Cakes
@@ -42,11 +37,12 @@ export const products: Product[] = [
     price: 450,
     pricePerLb: true,
     image: vanillaCake,
+    galleryImages: [chocolateCake, whiteforestCake, blackforestCake],
     description: "Light and fluffy vanilla sponge layered with fresh cream and vanilla buttercream. A timeless classic for all celebrations.",
     tags: ["fresh cream", "custom message", "bestseller"],
     available: true,
     popular: true,
-    sizes: [0.5, 1, 2, 3, 5]
+    sizes: [1, 2, 3, 5]
   },
   {
     id: "blackforest-cake",
@@ -57,11 +53,12 @@ export const products: Product[] = [
     price: 550,
     pricePerLb: true,
     image: blackforestCake,
+    galleryImages: [vanillaCake, chocolateCake, whiteforestCake],
     description: "Rich chocolate layers with cherry filling, whipped cream, and chocolate shavings. A German classic loved by all.",
     tags: ["chocolate", "cherry", "fresh cream", "custom message"],
     available: true,
     popular: true,
-    sizes: [0.5, 1, 2, 3, 5]
+    sizes: [1, 2, 3, 5]
   },
   {
     id: "chocolate-cake",
@@ -72,11 +69,12 @@ export const products: Product[] = [
     price: 600,
     pricePerLb: true,
     image: chocolateCake,
+    galleryImages: [blackforestCake, vanillaCake, whiteforestCake],
     description: "Decadent Belgian chocolate cake with dark chocolate ganache. For true chocolate lovers.",
     tags: ["dark chocolate", "ganache", "premium", "custom message"],
     available: true,
     popular: true,
-    sizes: [0.5, 1, 2, 3, 5]
+    sizes: [1, 2, 3, 5]
   },
   {
     id: "whiteforest-cake",
@@ -87,11 +85,12 @@ export const products: Product[] = [
     price: 580,
     pricePerLb: true,
     image: whiteforestCake,
+    galleryImages: [vanillaCake, chocolateCake, blackforestCake],
     description: "Delicate white chocolate sponge with cream cheese frosting and white chocolate curls. Pure elegance.",
     tags: ["white chocolate", "cream cheese", "elegant", "custom message"],
     available: true,
     popular: false,
-    sizes: [0.5, 1, 2, 3, 5]
+    sizes: [1, 2, 3, 5]
   },
   {
     id: "eggless-vanilla",
@@ -102,11 +101,12 @@ export const products: Product[] = [
     price: 480,
     pricePerLb: true,
     image: vanillaCake,
+    galleryImages: [chocolateCake, whiteforestCake],
     description: "Our signature eggless vanilla cake, just as soft and delicious. Perfect for vegetarian celebrations.",
     tags: ["eggless", "vegetarian", "fresh cream", "custom message"],
     available: true,
     popular: true,
-    sizes: [0.5, 1, 2, 3, 5]
+    sizes: [1, 2, 3, 5]
   },
   {
     id: "truffle-chocolate",
@@ -117,11 +117,12 @@ export const products: Product[] = [
     price: 650,
     pricePerLb: true,
     image: chocolateCake,
+    galleryImages: [blackforestCake, whiteforestCake, vanillaCake],
     description: "Intensely chocolatey truffle cake with a smooth, melt-in-mouth texture. A chocolate lover's dream.",
     tags: ["truffle", "premium", "rich", "custom message"],
     available: true,
     popular: true,
-    sizes: [0.5, 1, 2, 3, 5]
+    sizes: [1, 2, 3, 5]
   },
   // Decoration Items
   {
@@ -131,6 +132,7 @@ export const products: Product[] = [
     occasion: ["birthday"],
     price: 299,
     image: birthdayDecor,
+    galleryImages: [anniversaryDecor, weddingDecor],
     description: "Colorful balloon set with 'Happy Birthday' foil balloon, 20 latex balloons, and ribbon.",
     tags: ["balloons", "colorful", "party"],
     available: true,
@@ -143,6 +145,7 @@ export const products: Product[] = [
     occasion: ["birthday"],
     price: 199,
     image: birthdayDecor,
+    galleryImages: [anniversaryDecor],
     description: "Golden 'Happy Birthday' banner with matching number candles and sparkler candles.",
     tags: ["banner", "candles", "golden"],
     available: true,
@@ -155,6 +158,7 @@ export const products: Product[] = [
     occasion: ["anniversary"],
     price: 349,
     image: anniversaryDecor,
+    galleryImages: [weddingDecor, birthdayDecor],
     description: "Elegant rose gold 'Happy Anniversary' banner with heart-shaped balloons and romantic candles.",
     tags: ["rose gold", "romantic", "hearts"],
     available: true,
@@ -167,6 +171,7 @@ export const products: Product[] = [
     occasion: ["anniversary"],
     price: 499,
     image: anniversaryDecor,
+    galleryImages: [weddingDecor],
     description: "Complete table decoration set with rose petals, tea lights, and photo frame centerpiece.",
     tags: ["romantic", "roses", "premium"],
     available: true,
@@ -179,6 +184,7 @@ export const products: Product[] = [
     occasion: ["wedding"],
     price: 899,
     image: weddingDecor,
+    galleryImages: [anniversaryDecor, birthdayDecor],
     description: "Elegant wedding table decoration with white flowers, crystal votive holders, and satin runners.",
     tags: ["elegant", "white", "premium", "crystals"],
     available: true,
@@ -191,6 +197,7 @@ export const products: Product[] = [
     occasion: ["wedding"],
     price: 1299,
     image: weddingDecor,
+    galleryImages: [anniversaryDecor],
     description: "Stunning floral backdrop for wedding photos with fairy lights and draped fabric.",
     tags: ["backdrop", "flowers", "fairy lights", "premium"],
     available: true,

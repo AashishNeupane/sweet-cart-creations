@@ -1,19 +1,19 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ShoppingCart, Plus, Minus } from 'lucide-react';
+import { ShoppingCart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Product } from '@/data/products';
-import { useCart } from '@/context/CartContext';
+import { useCartStore } from '@/stores/useCartStore';
 
 interface ProductCardProps {
   product: Product;
 }
 
 const ProductCard = ({ product }: ProductCardProps) => {
-  const { addToCart } = useCart();
-  const [selectedSize, setSelectedSize] = useState(product.sizes?.[1] || 1);
+  const addToCart = useCartStore((state) => state.addToCart);
+  const [selectedSize, setSelectedSize] = useState(product.sizes?.[0] || 1);
   const [showSizeSelector, setShowSizeSelector] = useState(false);
 
   const currentPrice = product.pricePerLb 
