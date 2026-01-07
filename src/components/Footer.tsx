@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Phone, Mail, MapPin, Clock } from 'lucide-react';
+import SocialLinks from '@/components/SocialLinks';
 
 const Footer = () => {
   return (
@@ -10,11 +11,13 @@ const Footer = () => {
           <div className="lg:col-span-1">
             <Link to="/" className="flex items-center gap-2 mb-4">
               <span className="text-3xl">🎂</span>
-              <span className="font-display text-2xl font-semibold">Sweet Delights</span>
+              <span className="font-display text-2xl font-semibold">Blackberry Cakes</span>
             </Link>
-            <p className="text-cream-dark/80 text-sm leading-relaxed">
+            <p className="text-cream-dark/80 text-sm leading-relaxed mb-4">
               Crafting moments of joy with freshly baked cakes and beautiful decorations for your special celebrations.
             </p>
+            {/* Social Links */}
+            <SocialLinks variant="footer" />
           </div>
 
           {/* Quick Links */}
@@ -22,7 +25,7 @@ const Footer = () => {
             <h4 className="font-display text-lg font-semibold mb-4">Quick Links</h4>
             <ul className="space-y-2">
               {[
-                { label: 'Shop All', path: '/shop' },
+                { label: 'Shop All', path: '/' },
                 { label: 'Cakes', path: '/shop?category=cakes' },
                 { label: 'Decorations', path: '/shop?category=decoration' },
                 { label: 'About Us', path: '/about' },
@@ -68,15 +71,15 @@ const Footer = () => {
             <ul className="space-y-3">
               <li className="flex items-start gap-3 text-sm text-cream-dark/70">
                 <MapPin className="h-4 w-4 mt-0.5 shrink-0" />
-                <span>123 Baker Street, Sweet Town, ST 12345</span>
+                <span>Kathmandu, Nepal</span>
               </li>
               <li className="flex items-center gap-3 text-sm text-cream-dark/70">
                 <Phone className="h-4 w-4 shrink-0" />
-                <span>+1 234 567 8900</span>
+                <span>+977 986 740 3894</span>
               </li>
               <li className="flex items-center gap-3 text-sm text-cream-dark/70">
                 <Mail className="h-4 w-4 shrink-0" />
-                <span>hello@sweetdelights.com</span>
+                <span>hello@blackberrycakes.np</span>
               </li>
               <li className="flex items-start gap-3 text-sm text-cream-dark/70">
                 <Clock className="h-4 w-4 mt-0.5 shrink-0" />
@@ -92,7 +95,7 @@ const Footer = () => {
         {/* Bottom Bar */}
         <div className="border-t border-cream-dark/20 mt-12 pt-8 text-center">
           <p className="text-cream-dark/60 text-sm">
-            © {new Date().getFullYear()} Sweet Delights Bakery. All rights reserved. Made with 💕
+            © {new Date().getFullYear()} Blackberry Cakes. All rights reserved. Made with 💕
           </p>
         </div>
       </div>

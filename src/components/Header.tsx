@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { ShoppingCart, Menu, X, ChevronDown } from 'lucide-react';
+import { ShoppingCart, Menu, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { useCart } from '@/context/CartContext';
+import { useCartStore } from '@/stores/useCartStore';
+import SocialLinks from '@/components/SocialLinks';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,7 +14,7 @@ import {
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 
 const Header = () => {
-  const { getCartCount } = useCart();
+  const getCartCount = useCartStore((state) => state.getCartCount);
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const cartCount = getCartCount();
@@ -21,8 +22,7 @@ const Header = () => {
   const isActive = (path: string) => location.pathname === path;
 
   const navLinks = [
-    { path: '/', label: 'Home' },
-    { path: '/shop', label: 'Shop' },
+    { path: '/', label: 'Shop' },
     { path: '/about', label: 'About' },
     { path: '/contact', label: 'Contact' },
   ];
@@ -35,6 +35,14 @@ const Header = () => {
 
   return (
     <header className="sticky top-0 z-50 w-full bg-card/95 backdrop-blur-md border-b border-border">
+      {/* Top bar with social links */}
+      <div className="hidden md:block bg-chocolate text-cream-dark py-2">
+        <div className="container-custom flex items-center justify-between px-4 md:px-6">
+          <p className="text-xs">🎂 Fresh cakes baked daily | Free delivery on orders above ₹1000</p>
+          <SocialLinks variant="header" />
+        </div>
+      </div>
+
       <div className="container-custom flex h-16 md:h-20 items-center justify-between px-4 md:px-6">
         {/* Logo */}
         <Link 
@@ -43,13 +51,13 @@ const Header = () => {
         >
           <span className="text-2xl md:text-3xl">🎂</span>
           <span className="font-display text-xl md:text-2xl font-semibold text-chocolate">
-            Sweet Delights
+            Blackberry Cakes
           </span>
         </Link>
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-8">
-          {navLinks.slice(0, 2).map((link) => (
+          {navLinks.slice(0, 1).map((link) => (
             <Link
               key={link.path}
               to={link.path}
@@ -80,7 +88,7 @@ const Header = () => {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          {navLinks.slice(2).map((link) => (
+          {navLinks.slice(1).map((link) => (
             <Link
               key={link.path}
               to={link.path}
@@ -142,6 +150,11 @@ const Header = () => {
                       {occasion.label}
                     </Link>
                   ))}
+                </div>
+
+                <div className="border-t pt-4 mt-2">
+                  <p className="text-sm font-semibold text-muted-foreground mb-3">Follow Us</p>
+                  <SocialLinks variant="header" />
                 </div>
               </nav>
             </SheetContent>

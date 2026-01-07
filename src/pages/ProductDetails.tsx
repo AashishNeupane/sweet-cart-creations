@@ -4,22 +4,28 @@ import { ArrowLeft, ShoppingCart, Minus, Plus, Check } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
+import ProductGallery from '@/components/ProductGallery';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 import { products } from '@/data/products';
-import { useCart } from '@/context/CartContext';
+import { useCartStore } from '@/stores/useCartStore';
+import { useToast } from '@/hooks/use-toast';
 
 const ProductDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { addToCart, isInCart } = useCart();
+  const { addToCart, isInCart } = useCartStore();
+  const { toast } = useToast();
   
   const product = products.find(p => p.id === id);
   
   const [selectedSize, setSelectedSize] = useState(
-    product?.sizes?.[1] || product?.sizes?.[0] || 1
+    product?.sizes?.[0] || 1
   );
   const [quantity, setQuantity] = useState(1);
+  const [isEggless, setIsEggless] = useState(false);
 
   if (!product) {
     return (
@@ -30,7 +36,7 @@ const ProductDetails = () => {
             <p className="text-6xl mb-4">😕</p>
             <h1 className="font-display text-2xl font-bold mb-4">Product Not Found</h1>
             <Button asChild>
-              <Link to="/shop">Back to Shop</Link>
+              <Link to="/">Back to Shop</Link>
             </Button>
           </div>
         </main>
@@ -45,8 +51,19 @@ const ProductDetails = () => {
 
   const totalPrice = currentPrice * quantity;
 
+  const handleSizeChange = (increment: number) => {
+    const newSize = selectedSize + increment;
+    if (product.sizes && newSize >= 1 && newSize <= Math.max(...product.sizes)) {
+      setSelectedSize(newSize);
+    }
+  };
+
   const handleAddToCart = () => {
-    addToCart(product, quantity, product.category === 'cakes' ? selectedSize : undefined);
+    addToCart(product, quantity, product.category === 'cakes' ? selectedSize : undefined, isEggless);
+    toast({
+      title: 'Added to Cart! 🎉',
+      description: `${product.name}${product.category === 'cakes' ? ` (${selectedSize} lb)` : ''} added to your cart.`,
+    });
   };
 
   const relatedProducts = products
@@ -76,15 +93,11 @@ const ProductDetails = () => {
         <section className="container-custom section-padding !py-8 md:!py-12">
           <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
             {/* Image Gallery */}
-            <div className="space-y-4">
-              <div className="aspect-square rounded-2xl overflow-hidden bg-cream">
-                <img
-                  src={product.image}
-                  alt={product.name}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            </div>
+            <ProductGallery
+              mainImage={product.image}
+              galleryImages={product.galleryImages}
+              productName={product.name}
+            />
 
             {/* Product Info */}
             <div className="space-y-6">
@@ -144,18 +157,61 @@ const ProductDetails = () => {
                 </div>
               </div>
 
-              {/* Size Selector (for cakes) */}
+              {/* Eggless Option (for cakes only) */}
+              {product.category === 'cakes' && (
+                <div className="flex items-center justify-between p-4 bg-secondary/50 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <span className="text-xl">🥚</span>
+                    <div>
+                      <Label htmlFor="eggless" className="font-medium">Eggless Option</Label>
+                      <p className="text-sm text-muted-foreground">Make it 100% vegetarian</p>
+                    </div>
+                  </div>
+                  <Switch
+                    id="eggless"
+                    checked={isEggless}
+                    onCheckedChange={setIsEggless}
+                  />
+                </div>
+              )}
+
+              {/* Size Selector (for cakes) with +/- buttons */}
               {product.category === 'cakes' && product.sizes && (
                 <div className="space-y-3">
                   <label className="text-sm font-medium">
                     Select Size (pounds)
                   </label>
-                  <div className="flex flex-wrap gap-3">
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center border border-border rounded-lg bg-background">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleSizeChange(-1)}
+                        disabled={selectedSize <= 1}
+                      >
+                        <Minus className="h-4 w-4" />
+                      </Button>
+                      <span className="w-16 text-center font-semibold text-lg">{selectedSize} lb</span>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleSizeChange(1)}
+                        disabled={selectedSize >= Math.max(...product.sizes!)}
+                      >
+                        <Plus className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    <span className="text-sm text-muted-foreground">
+                      ₹{product.price}/lb
+                    </span>
+                  </div>
+                  {/* Size quick select */}
+                  <div className="flex flex-wrap gap-2">
                     {product.sizes.map(size => (
                       <button
                         key={size}
                         onClick={() => setSelectedSize(size)}
-                        className={`px-5 py-2.5 rounded-lg border-2 transition-all font-medium ${
+                        className={`px-4 py-2 rounded-lg border-2 transition-all font-medium text-sm ${
                           selectedSize === size
                             ? 'border-primary bg-primary text-primary-foreground'
                             : 'border-border hover:border-primary'

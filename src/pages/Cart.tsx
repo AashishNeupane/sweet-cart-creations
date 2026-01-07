@@ -1,14 +1,33 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, Trash2, Minus, Plus, ShoppingBag } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import UpsellPopup from '@/components/UpsellPopup';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { useCart } from '@/context/CartContext';
+import { Badge } from '@/components/ui/badge';
+import { useCartStore } from '@/stores/useCartStore';
+import { useUpsellStore } from '@/stores/useUpsellStore';
 
 const Cart = () => {
-  const { items, updateQuantity, removeFromCart, getCartTotal, clearCart } = useCart();
+  const { items, updateQuantity, removeFromCart, getCartTotal, clearCart, hasCakes, hasDecorations } = useCartStore();
+  const { openUpsell } = useUpsellStore();
+  const navigate = useNavigate();
+
+  const handleProceedToCheckout = () => {
+    const hasCakeItems = hasCakes();
+    const hasDecorationItems = hasDecorations();
+
+    // Show upsell popup based on cart contents
+    if (hasCakeItems && !hasDecorationItems) {
+      openUpsell('decorations');
+    } else if (hasDecorationItems && !hasCakeItems) {
+      openUpsell('cakes');
+    } else {
+      navigate('/checkout');
+    }
+  };
 
   if (items.length === 0) {
     return (
@@ -24,7 +43,7 @@ const Cart = () => {
               Looks like you haven't added any items yet. Let's find something delicious!
             </p>
             <Button asChild size="lg" className="gradient-warm text-primary-foreground rounded-full px-8">
-              <Link to="/shop">
+              <Link to="/">
                 <ShoppingBag className="mr-2 h-5 w-5" />
                 Start Shopping
               </Link>
@@ -66,7 +85,7 @@ const Cart = () => {
                 const totalItemPrice = itemPrice * item.quantity;
 
                 return (
-                  <Card key={`${item.product.id}-${item.selectedSize}`} className="overflow-hidden">
+                  <Card key={`${item.product.id}-${item.selectedSize}-${item.isEggless}`} className="overflow-hidden">
                     <CardContent className="p-4 md:p-6">
                       <div className="flex gap-4 md:gap-6">
                         {/* Image */}
@@ -95,6 +114,12 @@ const Cart = () => {
                                 {item.product.category === 'cakes' ? item.product.subcategory : 'Decoration'}
                                 {item.selectedSize && ` • ${item.selectedSize} lb`}
                               </p>
+                              {/* Eggless badge */}
+                              {item.isEggless && (
+                                <Badge variant="secondary" className="mt-1">
+                                  🥚 Eggless
+                                </Badge>
+                              )}
                             </div>
                             <Button
                               variant="ghost"
@@ -157,7 +182,7 @@ const Cart = () => {
 
               {/* Continue Shopping */}
               <Button asChild variant="ghost" className="mt-4">
-                <Link to="/shop" className="flex items-center gap-2">
+                <Link to="/" className="flex items-center gap-2">
                   <ArrowLeft className="h-4 w-4" />
                   Continue Shopping
                 </Link>
@@ -191,14 +216,12 @@ const Cart = () => {
                   </div>
 
                   <Button 
-                    asChild 
                     size="lg" 
                     className="w-full gradient-warm text-primary-foreground rounded-xl h-12"
+                    onClick={handleProceedToCheckout}
                   >
-                    <Link to="/checkout">
-                      Proceed to Checkout
-                      <ArrowRight className="ml-2 h-5 w-5" />
-                    </Link>
+                    Proceed to Checkout
+                    <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
 
                   <p className="text-xs text-center text-muted-foreground mt-4">
@@ -211,6 +234,7 @@ const Cart = () => {
         </div>
       </main>
       <Footer />
+      <UpsellPopup />
     </div>
   );
 };

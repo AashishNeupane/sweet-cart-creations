@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, MessageCircle, Calendar, Clock } from 'lucide-react';
 import Header from '@/components/Header';
@@ -10,10 +9,13 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Separator } from '@/components/ui/separator';
-import { useCart } from '@/context/CartContext';
-import { WHATSAPP_NUMBER } from '@/data/products';
+import { Badge } from '@/components/ui/badge';
+import { useCartStore } from '@/stores/useCartStore';
+import { useCheckoutStore } from '@/stores/useCheckoutStore';
+import { generateOrderMessage, openWhatsApp } from '@/lib/whatsapp';
 import { useToast } from '@/hooks/use-toast';
 import { z } from 'zod';
+import { useState } from 'react';
 
 const checkoutSchema = z.object({
   fullName: z.string().trim().min(2, 'Name must be at least 2 characters').max(100, 'Name is too long'),
@@ -26,19 +28,10 @@ const checkoutSchema = z.object({
 });
 
 const Checkout = () => {
-  const { items, getCartTotal, clearCart } = useCart();
+  const { items, getCartTotal, clearCart } = useCartStore();
+  const { formData, setFormField, setDeliveryDetail, resetForm } = useCheckoutStore();
   const navigate = useNavigate();
   const { toast } = useToast();
-
-  const [formData, setFormData] = useState({
-    fullName: '',
-    phone: '',
-    deliveryOption: 'delivery',
-    address: '',
-    deliveryDate: '',
-    deliveryTime: '',
-    notes: '',
-  });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -56,7 +49,7 @@ const Checkout = () => {
               Add some items to your cart before checkout
             </p>
             <Button asChild>
-              <Link to="/shop">Browse Products</Link>
+              <Link to="/">Browse Products</Link>
             </Button>
           </div>
         </main>
@@ -67,50 +60,15 @@ const Checkout = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormField(name as keyof typeof formData, value);
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
   };
 
-  const generateWhatsAppMessage = () => {
-    let message = `🎂 *Sweet Delights Bakery - New Order*\n\n`;
-    message += `*Customer Details:*\n`;
-    message += `Name: ${formData.fullName}\n`;
-    message += `Phone: ${formData.phone}\n`;
-    message += `Delivery: ${formData.deliveryOption === 'delivery' ? 'Home Delivery' : 'Pickup'}\n`;
-    
-    if (formData.deliveryOption === 'delivery' && formData.address) {
-      message += `Address: ${formData.address}\n`;
-    }
-    
-    message += `Date: ${formData.deliveryDate}\n`;
-    message += `Time: ${formData.deliveryTime}\n\n`;
-
-    message += `*Order Items:*\n`;
-    message += `${'─'.repeat(20)}\n`;
-
-    items.forEach(item => {
-      const itemPrice = item.product.pricePerLb && item.selectedSize
-        ? item.product.price * item.selectedSize
-        : item.product.price;
-      const totalItemPrice = itemPrice * item.quantity;
-
-      message += `• ${item.product.name}`;
-      if (item.selectedSize) {
-        message += ` (${item.selectedSize} lb)`;
-      }
-      message += `\n  Qty: ${item.quantity} × ₹${itemPrice} = ₹${totalItemPrice}\n`;
-    });
-
-    message += `${'─'.repeat(20)}\n`;
-    message += `*Total: ₹${getCartTotal()}*\n\n`;
-
-    if (formData.notes) {
-      message += `*Special Notes:*\n${formData.notes}\n`;
-    }
-
-    return encodeURIComponent(message);
+  const handleDeliveryDetailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setDeliveryDetail(name as 'secondaryPhone' | 'deliveryLocation' | 'landmark', value);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -125,7 +83,6 @@ const Checkout = () => {
     };
 
     try {
-      // Basic validation
       const result = checkoutSchema.safeParse(dataToValidate);
       
       if (!result.success) {
@@ -150,14 +107,27 @@ const Checkout = () => {
         return;
       }
 
-      // Generate WhatsApp link and open
-      const message = generateWhatsAppMessage();
-      const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${message}`;
+      // Generate WhatsApp message with structured format
+      const orderDetails = {
+        fullName: formData.fullName,
+        phone: formData.phone,
+        secondaryPhone: formData.deliveryDetails.secondaryPhone || undefined,
+        deliveryOption: formData.deliveryOption,
+        address: formData.address || undefined,
+        deliveryLocation: formData.deliveryDetails.deliveryLocation || undefined,
+        landmark: formData.deliveryDetails.landmark || undefined,
+        deliveryDate: formData.deliveryDate,
+        deliveryTime: formData.deliveryTime,
+        notes: formData.notes || undefined,
+      };
+
+      const message = generateOrderMessage(items, orderDetails, getCartTotal());
+      openWhatsApp(message);
       
-      window.open(whatsappUrl, '_blank');
-      
-      // Clear cart and redirect
+      // Clear cart and form
       clearCart();
+      resetForm();
+      
       toast({
         title: 'Order Sent! 🎉',
         description: 'Your order has been sent via WhatsApp. We\'ll confirm shortly!',
@@ -225,7 +195,7 @@ const Checkout = () => {
                           type="tel"
                           value={formData.phone}
                           onChange={handleChange}
-                          placeholder="+91 98765 43210"
+                          placeholder="+977 98XXXXXXXX"
                           className={errors.phone ? 'border-destructive' : ''}
                         />
                         {errors.phone && (
@@ -243,7 +213,7 @@ const Checkout = () => {
                     
                     <RadioGroup
                       value={formData.deliveryOption}
-                      onValueChange={(value) => setFormData(prev => ({ ...prev, deliveryOption: value }))}
+                      onValueChange={(value) => setFormField('deliveryOption', value as 'delivery' | 'pickup')}
                       className="space-y-4"
                     >
                       <div className="flex items-center space-x-3 p-4 border rounded-lg cursor-pointer hover:border-primary transition-colors">
@@ -263,20 +233,58 @@ const Checkout = () => {
                     </RadioGroup>
 
                     {formData.deliveryOption === 'delivery' && (
-                      <div className="mt-6 space-y-2 animate-fade-in">
-                        <Label htmlFor="address">Delivery Address *</Label>
-                        <Textarea
-                          id="address"
-                          name="address"
-                          value={formData.address}
-                          onChange={handleChange}
-                          placeholder="Enter your full delivery address"
-                          rows={3}
-                          className={errors.address ? 'border-destructive' : ''}
-                        />
-                        {errors.address && (
-                          <p className="text-sm text-destructive">{errors.address}</p>
-                        )}
+                      <div className="mt-6 space-y-4 animate-fade-in">
+                        <div className="space-y-2">
+                          <Label htmlFor="address">Delivery Address *</Label>
+                          <Textarea
+                            id="address"
+                            name="address"
+                            value={formData.address}
+                            onChange={handleChange}
+                            placeholder="Enter your full delivery address"
+                            rows={3}
+                            className={errors.address ? 'border-destructive' : ''}
+                          />
+                          {errors.address && (
+                            <p className="text-sm text-destructive">{errors.address}</p>
+                          )}
+                        </div>
+
+                        {/* Additional Delivery Fields */}
+                        <div className="grid sm:grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="secondaryPhone">Secondary Phone (Optional)</Label>
+                            <Input
+                              id="secondaryPhone"
+                              name="secondaryPhone"
+                              type="tel"
+                              value={formData.deliveryDetails.secondaryPhone}
+                              onChange={handleDeliveryDetailChange}
+                              placeholder="+977 98XXXXXXXX"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="deliveryLocation">Delivery Location</Label>
+                            <Input
+                              id="deliveryLocation"
+                              name="deliveryLocation"
+                              value={formData.deliveryDetails.deliveryLocation}
+                              onChange={handleDeliveryDetailChange}
+                              placeholder="e.g., Near main gate"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="landmark">Landmark</Label>
+                          <Input
+                            id="landmark"
+                            name="landmark"
+                            value={formData.deliveryDetails.landmark}
+                            onChange={handleDeliveryDetailChange}
+                            placeholder="e.g., Near ABC Hospital"
+                          />
+                        </div>
                       </div>
                     )}
                   </CardContent>
@@ -340,7 +348,7 @@ const Checkout = () => {
                         name="notes"
                         value={formData.notes}
                         onChange={handleChange}
-                        placeholder="Any special requests? E.g., 'Happy Birthday' message, eggless preference, etc."
+                        placeholder="Any special requests? E.g., 'Happy Birthday' message, specific decorations, etc."
                         rows={4}
                       />
                     </div>
@@ -362,7 +370,7 @@ const Checkout = () => {
                           : item.product.price;
 
                         return (
-                          <div key={`${item.product.id}-${item.selectedSize}`} className="flex gap-3">
+                          <div key={`${item.product.id}-${item.selectedSize}-${item.isEggless}`} className="flex gap-3">
                             <div className="w-16 h-16 rounded-lg overflow-hidden bg-cream shrink-0">
                               <img
                                 src={item.product.image}
@@ -376,6 +384,9 @@ const Checkout = () => {
                                 {item.selectedSize && `${item.selectedSize} lb • `}
                                 Qty: {item.quantity}
                               </p>
+                              {item.isEggless && (
+                                <Badge variant="secondary" className="text-xs mt-1">Eggless</Badge>
+                              )}
                               <p className="text-sm font-medium text-primary">
                                 ₹{itemPrice * item.quantity}
                               </p>
@@ -400,7 +411,7 @@ const Checkout = () => {
                       className="w-full gradient-warm text-primary-foreground rounded-xl h-14 text-lg"
                     >
                       <MessageCircle className="mr-2 h-5 w-5" />
-                      Order via WhatsApp
+                      Place Order on WhatsApp
                     </Button>
 
                     <p className="text-xs text-center text-muted-foreground mt-4">

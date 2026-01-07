@@ -1,25 +1,26 @@
-import { Phone, Mail, MapPin, Clock, MessageCircle } from 'lucide-react';
+import { Phone, Mail, MapPin, Clock, MessageCircle, Navigation } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import CustomOrderForm from '@/components/CustomOrderForm';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { WHATSAPP_NUMBER } from '@/data/products';
+import { SOCIAL_LINKS } from '@/lib/whatsapp';
 
 const contactInfo = [
   {
     icon: MapPin,
     title: 'Visit Us',
-    details: ['123 Baker Street', 'Sweet Town, ST 12345'],
+    details: ['Kathmandu, Nepal'],
   },
   {
     icon: Phone,
     title: 'Call Us',
-    details: ['+1 234 567 8900', '+1 234 567 8901'],
+    details: ['+977 986 740 3894'],
   },
   {
     icon: Mail,
     title: 'Email Us',
-    details: ['hello@sweetdelights.com', 'orders@sweetdelights.com'],
+    details: ['hello@blackberrycakes.np'],
   },
   {
     icon: Clock,
@@ -29,8 +30,6 @@ const contactInfo = [
 ];
 
 const Contact = () => {
-  const whatsappLink = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent("Hi! I'd like to know more about your products.")}`;
-
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -94,7 +93,7 @@ const Contact = () => {
                       size="lg" 
                       className="gradient-warm text-primary-foreground rounded-full w-fit"
                     >
-                      <a href={whatsappLink} target="_blank" rel="noopener noreferrer">
+                      <a href={SOCIAL_LINKS.whatsapp} target="_blank" rel="noopener noreferrer">
                         <MessageCircle className="mr-2 h-5 w-5" />
                         Message on WhatsApp
                       </a>
@@ -125,19 +124,65 @@ const Contact = () => {
           </div>
         </section>
 
+        {/* Custom Order Form */}
+        <section className="container-custom section-padding !py-12">
+          <div className="max-w-2xl mx-auto">
+            <CustomOrderForm />
+          </div>
+        </section>
+
         {/* Map Section */}
         <section className="container-custom section-padding !pt-0">
-          <div className="bg-muted rounded-2xl h-[400px] flex items-center justify-center">
-            <div className="text-center">
-              <MapPin className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <p className="text-muted-foreground">
-                Map integration placeholder
-              </p>
-              <p className="text-sm text-muted-foreground">
-                123 Baker Street, Sweet Town, ST 12345
-              </p>
-            </div>
-          </div>
+          <Card className="overflow-hidden border-0 shadow-elevated">
+            <CardContent className="p-0">
+              <div className="grid md:grid-cols-3">
+                {/* Map Embed */}
+                <div className="md:col-span-2 h-[400px]">
+                  <iframe
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3532.3063444424836!2d85.32159!3d27.7172!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjfCsDQzJzAxLjkiTiA4NcKwMTknMTcuOCJF!5e0!3m2!1sen!2snp!4v1600000000000!5m2!1sen!2snp"
+                    width="100%"
+                    height="100%"
+                    style={{ border: 0 }}
+                    allowFullScreen
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    title="Blackberry Cakes Location"
+                    className="w-full h-full"
+                  />
+                </div>
+
+                {/* Get Directions Panel */}
+                <div className="p-8 flex flex-col justify-center bg-gradient-to-br from-primary/5 to-primary/10">
+                  <div className="text-center md:text-left">
+                    <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto md:mx-0 mb-6">
+                      <Navigation className="h-8 w-8 text-primary" />
+                    </div>
+                    <h3 className="font-display text-2xl font-bold mb-3">
+                      Find Us
+                    </h3>
+                    <p className="text-muted-foreground mb-6">
+                      Kathmandu, Nepal<br />
+                      Open Mon-Sat 9AM-8PM
+                    </p>
+                    <Button 
+                      asChild
+                      size="lg"
+                      className="w-full md:w-auto gradient-warm text-primary-foreground"
+                    >
+                      <a 
+                        href={SOCIAL_LINKS.mapsDirections} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                      >
+                        <MapPin className="mr-2 h-5 w-5" />
+                        Get Directions
+                      </a>
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </section>
 
         {/* FAQ Teaser */}
@@ -152,8 +197,8 @@ const Contact = () => {
             <div className="grid sm:grid-cols-3 gap-6 max-w-3xl mx-auto text-left">
               {[
                 { q: 'How far in advance should I order?', a: 'We recommend ordering at least 24-48 hours in advance.' },
-                { q: 'Do you offer delivery?', a: 'Yes! We deliver within a 15km radius of our store.' },
-                { q: 'Can I customize my cake?', a: 'Absolutely! Contact us to discuss your custom design.' },
+                { q: 'Do you offer delivery?', a: 'Yes! We deliver within Kathmandu valley.' },
+                { q: 'Can I customize my cake?', a: 'Absolutely! Use our custom order form above.' },
               ].map((faq, i) => (
                 <Card key={i} className="border-0 shadow-soft">
                   <CardContent className="p-6">
