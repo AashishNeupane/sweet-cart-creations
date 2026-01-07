@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, ShoppingCart, Minus, Plus, Check } from 'lucide-react';
+import { ArrowLeft, ShoppingCart, Minus, Plus, Check, Star } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import BottomNav from '@/components/BottomNav';
 import ProductCard from '@/components/ProductCard';
 import ProductGallery from '@/components/ProductGallery';
+import ShareButton from '@/components/ShareButton';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
@@ -27,11 +29,18 @@ const ProductDetails = () => {
   const [quantity, setQuantity] = useState(1);
   const [isEggless, setIsEggless] = useState(false);
 
+  // Generate consistent random rating for each product based on id
+  const rating = useMemo(() => {
+    if (!product) return '4.5';
+    const seed = product.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    return (4 + (seed % 10) / 10).toFixed(1);
+  }, [product?.id]);
+
   if (!product) {
     return (
       <div className="min-h-screen flex flex-col">
         <Header />
-        <main className="flex-1 flex items-center justify-center">
+        <main className="flex-1 flex items-center justify-center pb-16 md:pb-0">
           <div className="text-center">
             <p className="text-6xl mb-4">😕</p>
             <h1 className="font-display text-2xl font-bold mb-4">Product Not Found</h1>
@@ -41,6 +50,7 @@ const ProductDetails = () => {
           </div>
         </main>
         <Footer />
+        <BottomNav />
       </div>
     );
   }
@@ -66,8 +76,18 @@ const ProductDetails = () => {
     });
   };
 
+  // For decoration items, add with quantity 1 directly
+  const handleQuickAddToCart = () => {
+    addToCart(product, 1, product.category === 'cakes' ? 1 : undefined, false);
+    toast({
+      title: 'Added to Cart! 🎉',
+      description: `${product.name} added to your cart.`,
+    });
+  };
+
+  // Show decoration items in related products for cakes and vice versa
   const relatedProducts = products
-    .filter(p => p.id !== product.id && p.category === product.category)
+    .filter(p => p.id !== product.id && p.category !== product.category)
     .slice(0, 4);
 
   const alreadyInCart = isInCart(product.id, product.category === 'cakes' ? selectedSize : undefined);
@@ -75,7 +95,7 @@ const ProductDetails = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-      <main className="flex-1 bg-background">
+      <main className="flex-1 bg-background pb-20 md:pb-0">
         {/* Breadcrumb */}
         <div className="bg-cream">
           <div className="container-custom px-4 py-4">
@@ -116,10 +136,35 @@ const ProductDetails = () => {
                 )}
               </div>
 
-              {/* Name */}
-              <h1 className="font-display text-3xl md:text-4xl font-bold text-foreground">
-                {product.name}
-              </h1>
+              {/* Name & Share */}
+              <div className="flex items-start justify-between gap-4">
+                <h1 className="font-display text-3xl md:text-4xl font-bold text-foreground">
+                  {product.name}
+                </h1>
+                <ShareButton 
+                  productName={product.name} 
+                  productUrl={`/product/${product.id}`}
+                  variant="button"
+                />
+              </div>
+
+              {/* Rating */}
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <Star 
+                      key={star} 
+                      className={`h-5 w-5 ${
+                        star <= Math.floor(Number(rating)) 
+                          ? 'fill-yellow-400 text-yellow-400' 
+                          : 'text-muted-foreground'
+                      }`} 
+                    />
+                  ))}
+                </div>
+                <span className="font-medium text-foreground">{rating}</span>
+                <span className="text-muted-foreground">/5</span>
+              </div>
 
               {/* Description */}
               <p className="text-muted-foreground text-lg leading-relaxed">
@@ -202,7 +247,7 @@ const ProductDetails = () => {
                       </Button>
                     </div>
                     <span className="text-sm text-muted-foreground">
-                      ₹{product.price}/lb
+                      Rs {product.price}/lb
                     </span>
                   </div>
                   {/* Size quick select */}
@@ -252,12 +297,13 @@ const ProductDetails = () => {
               {/* Price & Add to Cart */}
               <div className="space-y-4 pt-4">
                 <div className="flex items-baseline gap-2">
+                  <span className="text-lg font-medium text-muted-foreground">Rs</span>
                   <span className="font-display text-3xl font-bold text-primary">
-                    ₹{totalPrice}
+                    {totalPrice}
                   </span>
                   {product.pricePerLb && (
                     <span className="text-muted-foreground">
-                      (₹{product.price}/lb × {selectedSize} lb × {quantity})
+                      (Rs {product.price}/lb × {selectedSize} lb × {quantity})
                     </span>
                   )}
                 </div>
@@ -265,7 +311,7 @@ const ProductDetails = () => {
                 <Button
                   size="lg"
                   className="w-full h-14 text-lg rounded-xl gradient-warm text-primary-foreground"
-                  onClick={handleAddToCart}
+                  onClick={product.category === 'decoration' ? handleQuickAddToCart : handleAddToCart}
                   disabled={!product.available}
                 >
                   {alreadyInCart ? (
@@ -285,21 +331,22 @@ const ProductDetails = () => {
           </div>
         </section>
 
-        {/* Related Products */}
+        {/* Related Products - Show opposite category */}
         {relatedProducts.length > 0 && (
           <section className="container-custom section-padding !pt-0">
             <h2 className="font-display text-2xl font-bold mb-8">
-              You May Also Like
+              {product.category === 'cakes' ? 'Complete Your Party with Decorations' : 'Add a Delicious Cake'}
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {relatedProducts.map(product => (
-                <ProductCard key={product.id} product={product} />
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+              {relatedProducts.map(p => (
+                <ProductCard key={p.id} product={p} />
               ))}
             </div>
           </section>
         )}
       </main>
       <Footer />
+      <BottomNav />
     </div>
   );
 };

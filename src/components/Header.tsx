@@ -1,6 +1,5 @@
-import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { ShoppingCart, Menu, ChevronDown } from 'lucide-react';
+import { ShoppingCart, ChevronDown, PartyPopper } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useCartStore } from '@/stores/useCartStore';
@@ -11,18 +10,17 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 
 const Header = () => {
   const getCartCount = useCartStore((state) => state.getCartCount);
   const location = useLocation();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const cartCount = getCartCount();
 
   const isActive = (path: string) => location.pathname === path;
 
   const navLinks = [
     { path: '/', label: 'Shop' },
+    { path: '/shop?category=decoration', label: 'Decorations', icon: PartyPopper },
     { path: '/about', label: 'About' },
     { path: '/contact', label: 'Contact' },
   ];
@@ -38,7 +36,7 @@ const Header = () => {
       {/* Top bar with social links */}
       <div className="hidden md:block bg-chocolate text-cream-dark py-2">
         <div className="container-custom flex items-center justify-between px-4 md:px-6">
-          <p className="text-xs">🎂 Fresh cakes baked daily | Free delivery on orders above ₹1000</p>
+          <p className="text-xs">🎂 Fresh cakes baked daily | Free delivery on orders above Rs 1000</p>
           <SocialLinks variant="header" />
         </div>
       </div>
@@ -57,14 +55,17 @@ const Header = () => {
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-8">
-          {navLinks.slice(0, 1).map((link) => (
+          {navLinks.slice(0, 2).map((link) => (
             <Link
               key={link.path}
               to={link.path}
-              className={`text-sm font-medium transition-colors hover:text-primary ${
-                isActive(link.path) ? 'text-primary' : 'text-muted-foreground'
+              className={`flex items-center gap-1.5 text-sm font-medium transition-colors hover:text-primary ${
+                isActive(link.path) || (link.path.includes('?') && location.search === link.path.split('?')[1]) 
+                  ? 'text-primary' 
+                  : 'text-muted-foreground'
               }`}
             >
+              {link.icon && <link.icon className="h-4 w-4" />}
               {link.label}
             </Link>
           ))}
@@ -88,7 +89,7 @@ const Header = () => {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          {navLinks.slice(1).map((link) => (
+          {navLinks.slice(2).map((link) => (
             <Link
               key={link.path}
               to={link.path}
@@ -101,7 +102,7 @@ const Header = () => {
           ))}
         </nav>
 
-        {/* Right side - Cart & Mobile Menu */}
+        {/* Right side - Cart */}
         <div className="flex items-center gap-2">
           <Link to="/cart">
             <Button variant="ghost" size="icon" className="relative">
@@ -115,50 +116,6 @@ const Header = () => {
               )}
             </Button>
           </Link>
-
-          {/* Mobile Menu */}
-          <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-            <SheetTrigger asChild className="md:hidden">
-              <Button variant="ghost" size="icon">
-                <Menu className="h-5 w-5" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="right" className="w-[280px]">
-              <nav className="flex flex-col gap-4 mt-8">
-                {navLinks.map((link) => (
-                  <Link
-                    key={link.path}
-                    to={link.path}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className={`text-lg font-medium py-2 transition-colors ${
-                      isActive(link.path) ? 'text-primary' : 'text-foreground'
-                    }`}
-                  >
-                    {link.label}
-                  </Link>
-                ))}
-                
-                <div className="border-t pt-4 mt-2">
-                  <p className="text-sm font-semibold text-muted-foreground mb-3">Occasions</p>
-                  {occasions.map((occasion) => (
-                    <Link
-                      key={occasion.path}
-                      to={occasion.path}
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="block text-base py-2 text-foreground hover:text-primary transition-colors"
-                    >
-                      {occasion.label}
-                    </Link>
-                  ))}
-                </div>
-
-                <div className="border-t pt-4 mt-2">
-                  <p className="text-sm font-semibold text-muted-foreground mb-3">Follow Us</p>
-                  <SocialLinks variant="header" />
-                </div>
-              </nav>
-            </SheetContent>
-          </Sheet>
         </div>
       </div>
     </header>
