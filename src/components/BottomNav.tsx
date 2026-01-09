@@ -18,7 +18,7 @@ const BottomNav = () => {
     { path: '/shop?category=cakes', label: 'Cakes', icon: Cake },
     { path: '/shop?category=decoration', label: 'Decor', icon: PartyPopper },
     { path: '/cart', label: 'Cart', icon: ShoppingCart, badge: cartCount },
-    { path: '/contact', label: 'Contact', icon: User },
+    { path: '/track-order', label: 'Track', icon: User },
   ];
 
   return (

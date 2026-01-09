@@ -162,11 +162,11 @@ export function AdminProducts() {
     <div className="min-h-screen">
       <AdminHeader title="Products" />
       
-      <div className="p-6 space-y-6">
+      <div className="p-4 lg:p-6 space-y-4 lg:space-y-6">
         {/* Toolbar */}
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div className="flex flex-1 gap-4">
-            <div className="relative flex-1 max-w-sm">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col sm:flex-row gap-3 flex-1">
+            <div className="relative flex-1 sm:max-w-sm">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 placeholder="Search products..."
@@ -176,7 +176,7 @@ export function AdminProducts() {
               />
             </div>
             <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="w-full sm:w-[150px]">
                 <Filter className="mr-2 h-4 w-4" />
                 <SelectValue placeholder="Category" />
               </SelectTrigger>
@@ -193,12 +193,12 @@ export function AdminProducts() {
             if (!open) resetForm();
           }}>
             <DialogTrigger asChild>
-              <Button>
+              <Button className="w-full sm:w-auto">
                 <Plus className="mr-2 h-4 w-4" />
                 Add Product
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto mx-4">
               <DialogHeader>
                 <DialogTitle>{editingProduct ? 'Edit Product' : 'Add New Product'}</DialogTitle>
                 <DialogDescription>
@@ -206,7 +206,7 @@ export function AdminProducts() {
                 </DialogDescription>
               </DialogHeader>
               <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="name">Product Name *</Label>
                     <Input
@@ -227,7 +227,7 @@ export function AdminProducts() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="category">Category *</Label>
                     <Select 
@@ -254,7 +254,7 @@ export function AdminProducts() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="price">Price (Rs) *</Label>
                     <Input
@@ -309,7 +309,7 @@ export function AdminProducts() {
                   />
                 </div>
 
-                <div className="flex flex-wrap gap-6">
+                <div className="flex flex-wrap gap-4 lg:gap-6">
                   <div className="flex items-center space-x-2">
                     <Switch
                       id="available"
@@ -338,7 +338,7 @@ export function AdminProducts() {
                   )}
                 </div>
 
-                <DialogFooter>
+                <DialogFooter className="flex-col sm:flex-row gap-2">
                   <Button type="button" variant="outline" onClick={() => {
                     setIsAddDialogOpen(false);
                     resetForm();
@@ -354,8 +354,64 @@ export function AdminProducts() {
           </Dialog>
         </div>
 
-        {/* Products Table */}
-        <Card>
+        {/* Products - Mobile Cards */}
+        <div className="lg:hidden space-y-3">
+          {filteredProducts.map((product) => (
+            <Card key={product.id} className="overflow-hidden">
+              <CardContent className="p-4">
+                <div className="flex gap-4">
+                  <img
+                    src={product.image}
+                    alt={product.name}
+                    className="h-20 w-20 rounded-lg object-cover"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-2">
+                      <p className="font-medium truncate">{product.name}</p>
+                      <Badge variant={product.available ? 'default' : 'secondary'} className="shrink-0">
+                        {product.available ? 'Active' : 'Inactive'}
+                      </Badge>
+                    </div>
+                    <p className="text-sm text-muted-foreground capitalize">{product.category}</p>
+                    <p className="font-semibold mt-1">
+                      Rs {product.price}
+                      {product.pricePerLb && <span className="text-muted-foreground font-normal">/lb</span>}
+                    </p>
+                    <div className="flex gap-1 mt-2">
+                      {product.tags.slice(0, 2).map((tag) => (
+                        <Badge key={tag} variant="secondary" className="text-xs">
+                          {tag}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                <div className="flex gap-2 mt-3 pt-3 border-t">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1"
+                    onClick={() => handleEdit(product)}
+                  >
+                    <Pencil className="h-4 w-4 mr-1" />
+                    Edit
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="text-destructive hover:text-destructive"
+                    onClick={() => handleDelete(product.id)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {/* Products Table - Desktop */}
+        <Card className="hidden lg:block">
           <CardContent className="p-0">
             <Table>
               <TableHeader>
