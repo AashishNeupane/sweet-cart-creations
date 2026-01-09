@@ -30,6 +30,7 @@ import {
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
 import { products, categories, cakeFlavors, occasions } from '@/data/products';
+import BottomNav from '@/components/BottomNav';
 
 const Shop = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -392,6 +393,7 @@ const Shop = () => {
         </div>
       </main>
       <Footer />
+      <BottomNav />
     </div>
   );
 };

@@ -1,6 +1,7 @@
 import { Phone, Mail, MapPin, Clock, MessageCircle, Navigation } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import BottomNav from '@/components/BottomNav';
 import CustomOrderForm from '@/components/CustomOrderForm';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -212,6 +213,7 @@ const Contact = () => {
         </section>
       </main>
       <Footer />
+      <BottomNav />
     </div>
   );
 };

@@ -89,6 +89,16 @@ const Header = () => {
             </DropdownMenuContent>
           </DropdownMenu>
 
+          {/* Track Order Link */}
+          <Link
+            to="/track-order"
+            className={`text-sm font-medium transition-colors hover:text-primary ${
+              isActive('/track-order') ? 'text-primary' : 'text-muted-foreground'
+            }`}
+          >
+            Track Order
+          </Link>
+
           {navLinks.slice(2).map((link) => (
             <Link
               key={link.path}
