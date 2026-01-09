@@ -74,11 +74,11 @@ export function AdminOrders() {
     <div className="min-h-screen">
       <AdminHeader title="Orders" />
       
-      <div className="p-6 space-y-6">
+      <div className="p-4 lg:p-6 space-y-4 lg:space-y-6">
         {/* Filters */}
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex flex-1 flex-wrap gap-4">
-            <div className="relative w-full max-w-xs">
+        <div className="flex flex-col gap-3">
+          <div className="flex flex-col sm:flex-row gap-3">
+            <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
                 placeholder="Search orders..."
@@ -88,7 +88,7 @@ export function AdminOrders() {
               />
             </div>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="w-full sm:w-[150px]">
                 <Filter className="mr-2 h-4 w-4" />
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
@@ -106,8 +106,64 @@ export function AdminOrders() {
           <DateRangePicker date={dateRange} onDateChange={setDateRange} />
         </div>
 
-        {/* Orders Table */}
-        <Card>
+        {/* Orders - Mobile Cards */}
+        <div className="lg:hidden space-y-3">
+          {filteredOrders.map((order) => (
+            <Card key={order.id} className="overflow-hidden">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="font-medium">{order.orderNumber}</span>
+                  <OrderStatusBadge status={order.status} />
+                </div>
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">Customer</span>
+                    <span className="font-medium">{order.customerName}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">Phone</span>
+                    <span>{order.phone}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">Date</span>
+                    <span>{format(order.createdAt, 'MMM dd, yyyy')}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">Total</span>
+                    <span className="font-semibold">Rs {order.total.toLocaleString()}</span>
+                  </div>
+                  <div className="flex items-center gap-2 pt-2">
+                    {order.items.slice(0, 3).map((item) => (
+                      <img
+                        key={item.id}
+                        src={item.productImage}
+                        alt={item.productName}
+                        className="h-10 w-10 rounded object-cover"
+                      />
+                    ))}
+                    {order.items.length > 3 && (
+                      <span className="text-xs text-muted-foreground">
+                        +{order.items.length - 3}
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full mt-3"
+                  onClick={() => setSelectedOrder(order)}
+                >
+                  <Eye className="h-4 w-4 mr-2" />
+                  View Details
+                </Button>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {/* Orders Table - Desktop */}
+        <Card className="hidden lg:block">
           <CardContent className="p-0">
             <Table>
               <TableHeader>

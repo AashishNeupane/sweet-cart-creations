@@ -92,10 +92,10 @@ export function AdminCustomOrders() {
     <div className="min-h-screen">
       <AdminHeader title="Custom Orders" />
       
-      <div className="p-6 space-y-6">
+      <div className="p-4 lg:p-6 space-y-4 lg:space-y-6">
         {/* Search */}
         <div className="flex items-center gap-4">
-          <div className="relative flex-1 max-w-sm">
+          <div className="relative flex-1 sm:max-w-sm">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               placeholder="Search custom orders..."
@@ -108,19 +108,78 @@ export function AdminCustomOrders() {
 
         {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList>
-            {tabs.map((tab) => (
-              <TabsTrigger key={tab.value} value={tab.value} className="gap-2">
-                {tab.label}
-                <Badge variant="secondary" className="ml-1">
-                  {tab.count}
-                </Badge>
-              </TabsTrigger>
-            ))}
-          </TabsList>
+          <div className="overflow-x-auto -mx-4 px-4 lg:mx-0 lg:px-0">
+            <TabsList className="w-max">
+              {tabs.map((tab) => (
+                <TabsTrigger key={tab.value} value={tab.value} className="gap-1 text-xs sm:text-sm sm:gap-2">
+                  {tab.label}
+                  <Badge variant="secondary" className="ml-0.5 sm:ml-1 text-[10px] sm:text-xs">
+                    {tab.count}
+                  </Badge>
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </div>
 
           <TabsContent value={activeTab} className="mt-4">
-            <Card>
+            {/* Mobile Cards */}
+            <div className="lg:hidden space-y-3">
+              {getFilteredOrders(activeTab).map((order) => (
+                <Card key={order.id} className="overflow-hidden">
+                  <CardContent className="p-4">
+                    <div className="flex items-start justify-between mb-3">
+                      <div>
+                        <p className="font-medium">{order.customerName}</p>
+                        <p className="text-sm text-muted-foreground">{order.phone}</p>
+                      </div>
+                      <Badge className={cn('font-medium text-xs', statusConfig[order.status].className)}>
+                        {statusConfig[order.status].label}
+                      </Badge>
+                    </div>
+                    <p className="text-sm line-clamp-2 text-muted-foreground mb-3">
+                      {order.cakeDetails}
+                    </p>
+                    <div className="flex items-center justify-between text-sm">
+                      <div className="flex items-center gap-2">
+                        {order.referenceImage && (
+                          <Badge variant="outline" className="gap-1 text-xs">
+                            <Image className="h-3 w-3" />
+                            Image
+                          </Badge>
+                        )}
+                        {order.preferredDate && (
+                          <span className="text-muted-foreground text-xs">
+                            {format(order.preferredDate, 'MMM dd')}
+                          </span>
+                        )}
+                      </div>
+                      {order.quotedPrice && (
+                        <span className="font-semibold">Rs {order.quotedPrice.toLocaleString()}</span>
+                      )}
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full mt-3"
+                      onClick={() => openOrderDetails(order)}
+                    >
+                      <Eye className="h-4 w-4 mr-2" />
+                      View Details
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+              {getFilteredOrders(activeTab).length === 0 && (
+                <Card>
+                  <CardContent className="py-8 text-center text-muted-foreground">
+                    No custom orders found
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+
+            {/* Desktop Table */}
+            <Card className="hidden lg:block">
               <CardContent className="p-0">
                 <Table>
                   <TableHeader>
