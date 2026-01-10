@@ -11,6 +11,7 @@ import About from "./pages/About";
 import Contact from "./pages/Contact";
 import TrackOrder from "./pages/TrackOrder";
 import NotFound from "./pages/NotFound";
+import WhatsAppFloatingButton from "./components/WhatsAppFloatingButton";
 
 // Admin imports
 import { AdminLayout } from "./admin/components/AdminLayout";
@@ -50,6 +51,7 @@ const App = () => (
           
           <Route path="*" element={<NotFound />} />
         </Routes>
+        <WhatsAppFloatingButton />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

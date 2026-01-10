@@ -3,6 +3,7 @@ import { CartItem } from '@/stores/useCartStore';
 export const WHATSAPP_NUMBER = '9779867403894'; // Nepal number with country code
 
 export const SOCIAL_LINKS = {
+  tiktok: 'https://www.tiktok.com/@blackberrycakes.np',
   facebook: 'https://www.facebook.com/blackberrycakes.np',
   instagram: 'https://www.instagram.com/blackberrycakes.np/',
   whatsapp: `https://wa.me/${WHATSAPP_NUMBER}`,
