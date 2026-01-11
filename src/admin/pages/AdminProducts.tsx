@@ -58,6 +58,8 @@ export function AdminProducts() {
     pricePerLb: false,
     sizes: '',
     occasions: [] as string[],
+    image: '',
+    galleryImages: '',
   });
 
   const filteredProducts = products.filter((product) => {
@@ -81,12 +83,18 @@ export function AdminProducts() {
       pricePerLb: false,
       sizes: '',
       occasions: [],
+      image: '',
+      galleryImages: '',
     });
     setEditingProduct(null);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    const galleryImagesArray = formData.galleryImages 
+      ? formData.galleryImages.split(',').map(url => url.trim()).filter(url => url)
+      : undefined;
     
     if (editingProduct) {
       // Update existing product
@@ -99,6 +107,8 @@ export function AdminProducts() {
               stock: parseInt(formData.stock) || 0,
               tags: formData.tags.split(',').map(t => t.trim()),
               sizes: formData.sizes ? formData.sizes.split(',').map(s => parseFloat(s.trim())) : undefined,
+              image: formData.image || p.image,
+              galleryImages: galleryImagesArray,
               updatedAt: new Date(),
             } 
           : p
@@ -114,7 +124,8 @@ export function AdminProducts() {
         occasion: formData.occasions,
         price: parseFloat(formData.price),
         pricePerLb: formData.pricePerLb,
-        image: '/placeholder.svg',
+        image: formData.image || '/placeholder.svg',
+        galleryImages: galleryImagesArray,
         description: formData.description,
         tags: formData.tags.split(',').map(t => t.trim()),
         available: formData.available,
@@ -149,6 +160,8 @@ export function AdminProducts() {
       pricePerLb: product.pricePerLb || false,
       sizes: product.sizes?.join(', ') || '',
       occasions: product.occasion,
+      image: product.image || '',
+      galleryImages: product.galleryImages?.join(', ') || '',
     });
     setIsAddDialogOpen(true);
   };
@@ -307,6 +320,52 @@ export function AdminProducts() {
                     onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
                     placeholder="eggless, premium, bestseller"
                   />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="image">Thumbnail Image URL *</Label>
+                  <Input
+                    id="image"
+                    value={formData.image}
+                    onChange={(e) => setFormData({ ...formData, image: e.target.value })}
+                    placeholder="https://example.com/thumbnail.jpg"
+                  />
+                  {formData.image && (
+                    <div className="mt-2">
+                      <img 
+                        src={formData.image} 
+                        alt="Thumbnail preview" 
+                        className="h-20 w-20 object-cover rounded-lg border"
+                        onError={(e) => (e.currentTarget.style.display = 'none')}
+                      />
+                    </div>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="galleryImages">Sample/Gallery Images (comma-separated URLs)</Label>
+                  <Textarea
+                    id="galleryImages"
+                    value={formData.galleryImages}
+                    onChange={(e) => setFormData({ ...formData, galleryImages: e.target.value })}
+                    placeholder="https://example.com/image1.jpg, https://example.com/image2.jpg"
+                    rows={2}
+                  />
+                  {formData.galleryImages && (
+                    <div className="mt-2 flex gap-2 flex-wrap">
+                      {formData.galleryImages.split(',').map((url, idx) => (
+                        url.trim() && (
+                          <img 
+                            key={idx}
+                            src={url.trim()} 
+                            alt={`Gallery preview ${idx + 1}`} 
+                            className="h-16 w-16 object-cover rounded-lg border"
+                            onError={(e) => (e.currentTarget.style.display = 'none')}
+                          />
+                        )
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 <div className="flex flex-wrap gap-4 lg:gap-6">
