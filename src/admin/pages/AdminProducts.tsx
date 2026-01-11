@@ -35,6 +35,7 @@ import { Switch } from '@/components/ui/switch';
 import { mockProducts } from '../data/mockData';
 import { AdminProduct } from '../types';
 import { toast } from 'sonner';
+import { ImageUpload, MultiImageUpload } from '../components/ImageUpload';
 
 export function AdminProducts() {
   const [products, setProducts] = useState<AdminProduct[]>(mockProducts);
@@ -59,7 +60,7 @@ export function AdminProducts() {
     sizes: '',
     occasions: [] as string[],
     image: '',
-    galleryImages: '',
+    galleryImages: [] as string[],
   });
 
   const filteredProducts = products.filter((product) => {
@@ -84,7 +85,7 @@ export function AdminProducts() {
       sizes: '',
       occasions: [],
       image: '',
-      galleryImages: '',
+      galleryImages: [],
     });
     setEditingProduct(null);
   };
@@ -92,8 +93,8 @@ export function AdminProducts() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    const galleryImagesArray = formData.galleryImages 
-      ? formData.galleryImages.split(',').map(url => url.trim()).filter(url => url)
+    const galleryImagesArray = formData.galleryImages.length > 0 
+      ? formData.galleryImages
       : undefined;
     
     if (editingProduct) {
@@ -161,7 +162,7 @@ export function AdminProducts() {
       sizes: product.sizes?.join(', ') || '',
       occasions: product.occasion,
       image: product.image || '',
-      galleryImages: product.galleryImages?.join(', ') || '',
+      galleryImages: product.galleryImages || [],
     });
     setIsAddDialogOpen(true);
   };
@@ -322,51 +323,18 @@ export function AdminProducts() {
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="image">Thumbnail Image URL *</Label>
-                  <Input
-                    id="image"
-                    value={formData.image}
-                    onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-                    placeholder="https://example.com/thumbnail.jpg"
-                  />
-                  {formData.image && (
-                    <div className="mt-2">
-                      <img 
-                        src={formData.image} 
-                        alt="Thumbnail preview" 
-                        className="h-20 w-20 object-cover rounded-lg border"
-                        onError={(e) => (e.currentTarget.style.display = 'none')}
-                      />
-                    </div>
-                  )}
-                </div>
+                <ImageUpload
+                  label="Thumbnail Image *"
+                  value={formData.image}
+                  onChange={(value) => setFormData({ ...formData, image: value })}
+                />
 
-                <div className="space-y-2">
-                  <Label htmlFor="galleryImages">Sample/Gallery Images (comma-separated URLs)</Label>
-                  <Textarea
-                    id="galleryImages"
-                    value={formData.galleryImages}
-                    onChange={(e) => setFormData({ ...formData, galleryImages: e.target.value })}
-                    placeholder="https://example.com/image1.jpg, https://example.com/image2.jpg"
-                    rows={2}
-                  />
-                  {formData.galleryImages && (
-                    <div className="mt-2 flex gap-2 flex-wrap">
-                      {formData.galleryImages.split(',').map((url, idx) => (
-                        url.trim() && (
-                          <img 
-                            key={idx}
-                            src={url.trim()} 
-                            alt={`Gallery preview ${idx + 1}`} 
-                            className="h-16 w-16 object-cover rounded-lg border"
-                            onError={(e) => (e.currentTarget.style.display = 'none')}
-                          />
-                        )
-                      ))}
-                    </div>
-                  )}
-                </div>
+                <MultiImageUpload
+                  label="Sample/Gallery Images"
+                  values={formData.galleryImages}
+                  onChange={(values) => setFormData({ ...formData, galleryImages: values })}
+                  maxImages={6}
+                />
 
                 <div className="flex flex-wrap gap-4 lg:gap-6">
                   <div className="flex items-center space-x-2">
